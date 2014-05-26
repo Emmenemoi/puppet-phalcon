@@ -58,15 +58,13 @@ class phalcon(
     default                                 => '/',
   }
 
-  package {$require_packages:
-    ensure => 'present',
-  }->
   puppi::netinstall {'cphalcon':
     url                 => $url,
     destination_dir     => '/var/tmp',
     extracted_dir       => "$extracted_dir",
     postextract_cwd     => "/var/tmp/$extracted_dir/build",
     postextract_command => './install',
+    require             => Package[$require_packages],
   }->
   file { "${php_config_dir}${http_sapi}conf.d/phalcon.ini":
     ensure  => 'present',
