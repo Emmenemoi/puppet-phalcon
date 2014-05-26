@@ -29,7 +29,7 @@
 #     version => 'phalcon-v1.3.1',
 #   }
 #
-# TODO: Remove dependancy on puppi::netinstall
+# TODO: Remove dependency on puppi::netinstall
 #
 class phalcon(
   $version = params_lookup('version'),
