@@ -3,6 +3,8 @@
 class phalcon::params {
   $version = 'master'
 
+  $manage_packages = true
+
   $php_config_dir = $::operatingsystem ? {
     /(?i:Ubuntu|Debian|Mint|SLES|OpenSuSE)/ => '/etc/php5',
     default                                 => '/etc/php.d',
@@ -13,4 +15,10 @@ class phalcon::params {
     /(?i:SLES|OpenSuSe)/      => ['php5','php5-devel', 'pcre-devel'],
     default                   => ['php', 'php-devel', 'pcre-devel'],
   }
+
+  $http_sapi = $::operatingsystem ? {
+    /(?i:Ubuntu|Debian|Mint|SLES|OpenSuSE)/ => 'apache2',
+    default                                 => '',
+  }
+
 }

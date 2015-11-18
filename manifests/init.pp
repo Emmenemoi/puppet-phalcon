@@ -2,12 +2,12 @@
 #
 #
 # == Parameters
-# 
+#
 # [*version*]
 #   The version of the cphalcon framework to install. Default is master or the
 #   latest. The version must match a release tag in the cphalcon repository.
 #
-# 
+#
 # Example:
 #   phalcon {'install_phalcon':
 #     version => 'master',
@@ -33,6 +33,9 @@
 #
 class phalcon(
   $version = params_lookup('version'),
+  $manage_packages = $phalcon::params::manage_packages,
+  $http_sapi = $phalcon::params::http_sapi,
+  $require_packages = $phalcon::params::require_packages,
 ) inherits phalcon::params {
 
   $version_number = $version ? {
@@ -53,9 +56,8 @@ class phalcon(
     $extracted_dir = "cphalcon-phalcon-v$version_number"
   }
 
-  $http_sapi = $::operatingsystem ? {
-    /(?i:Ubuntu|Debian|Mint|SLES|OpenSuSE)/ => '/apache2/',
-    default                                 => '/',
+  if $manage_packages {
+    ensure_packages( $require_packages , {ensure => 'present', before => Puppi::Netinstall['cphalcon'] })
   }
 
   puppi::netinstall {'cphalcon':
@@ -66,7 +68,7 @@ class phalcon(
     postextract_command => './install',
     require             => Package[$require_packages],
   }->
-  file { "${php_config_dir}${http_sapi}conf.d/phalcon.ini":
+  file { "${php_config_dir}/${http_sapi}/conf.d/phalcon.ini":
     ensure  => 'present',
     source  => 'puppet:///modules/phalcon/phalcon.ini',
   }->
