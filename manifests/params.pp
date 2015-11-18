@@ -21,4 +21,10 @@ class phalcon::params {
     default                                 => '',
   }
 
+  if $::php_version == '' or versioncmp($::php_version, '5.4') >= 0 {
+    $mods_root_ini = "${php_config_dir}/mods-available"
+  } else {
+    $mods_root_ini = "${php_config_dir}/conf.d"
+  }
+
 }

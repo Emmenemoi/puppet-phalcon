@@ -36,6 +36,7 @@ class phalcon(
   $manage_packages = $phalcon::params::manage_packages,
   $http_sapi = $phalcon::params::http_sapi,
   $require_packages = $phalcon::params::require_packages,
+  $mods_root_ini = $phalcon::params::mods_root_ini,
 ) inherits phalcon::params {
 
   $version_number = $version ? {
@@ -60,6 +61,8 @@ class phalcon(
     ensure_packages( $require_packages , {ensure => 'present', before => Puppi::Netinstall['cphalcon'] })
   }
 
+  $ini_file = "${mods_root_ini}/phalcon.ini"
+
   puppi::netinstall {'cphalcon':
     url                 => $url,
     destination_dir     => '/var/tmp',
@@ -68,12 +71,24 @@ class phalcon(
     postextract_command => './install',
     require             => Package[$require_packages],
   }->
-  file { "${php_config_dir}/${http_sapi}/conf.d/phalcon.ini":
-    ensure  => 'present',
-    source  => 'puppet:///modules/phalcon/phalcon.ini',
-  }->
-  file { "${php_config_dir}/cli/conf.d/phalcon.ini":
+  file { $ini_file :
     ensure  => 'present',
     source  => 'puppet:///modules/phalcon/phalcon.ini',
   }
+
+  exec { "exec php5enmod phalcon":
+    command     => "php5enmod phalcon",
+    path        => ['/usr/local/sbin', '/usr/local/bin', '/usr/sbin', '/usr/bin', '/sbin', '/bin'],
+    subscribe   => File[$ini_file],
+    refreshonly => true,
+  }
+
+  #file { "${php_config_dir}/${http_sapi}/conf.d/phalcon.ini":
+  #  ensure  => 'present',
+  #  source  => 'puppet:///modules/phalcon/phalcon.ini',
+  #}->
+  #file { "${php_config_dir}/cli/conf.d/phalcon.ini":
+  #  ensure  => 'present',
+  #  source  => 'puppet:///modules/phalcon/phalcon.ini',
+  #}
 }
